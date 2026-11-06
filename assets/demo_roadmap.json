@@ -1,0 +1,181 @@
+{
+  "id": "demo-python-data",
+  "title": "5-Day Python for Data Analysis",
+  "goal": "Analyse real datasets with Python",
+  "skill_level": "Beginner",
+  "total_duration": "5 Days",
+  "daily_commitment": "2 Hours/Day",
+  "expected_outcome": "You can load a messy CSV, clean it, compute grouped statistics, plot the results, and explain what the numbers mean.",
+  "milestones": [
+    "Day 2: comfortable with NumPy arrays and vectorised maths",
+    "Day 4: produce a clean multi-panel chart from raw data",
+    "Day 5: ship a small end-to-end analysis notebook"
+  ],
+  "days": [
+    {
+      "day_number": 1,
+      "topic_title": "Python setup, syntax and data structures",
+      "estimated_time": "2 Hours",
+      "concept_explanation": "Set up a virtual environment and a notebook, then practise the four structures you will use every day: lists, dictionaries, sets and generators. The goal is fluency, not theory: you should be able to transform a list of records without looking things up.",
+      "key_takeaways": [
+        "A virtual environment keeps project packages separate from the system Python.",
+        "Dictionary and list comprehensions replace most short loops.",
+        "Generators stream data instead of loading it all into memory."
+      ],
+      "resources": [
+        {
+          "title": "Python Tutorial: Data Structures",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html",
+          "platform": "Official Docs",
+          "channel_or_author": "Python Software Foundation",
+          "relevance_note": "Canonical reference for lists, dicts, sets and comprehensions.",
+          "is_mcp_verified": false
+        },
+        {
+          "title": "Python for Beginners (search)",
+          "url": "https://www.youtube.com/results?search_query=python+for+beginners+full+course",
+          "platform": "YouTube",
+          "channel_or_author": null,
+          "relevance_note": "Pick one long-form course and follow along in your own editor.",
+          "is_mcp_verified": false
+        }
+      ],
+      "practice_exercises": [
+        "Create a virtual environment, install pandas, and confirm the import works.",
+        "Parse a list of 'name,score' strings into a dictionary of scores with a comprehension."
+      ],
+      "assignment": "Write a script that reads a list of log lines and counts how often each status code appears, using collections.Counter.",
+      "revision_checkpoint": "Why is a dictionary lookup O(1) while a list search is O(n)?",
+      "completed": false
+    },
+    {
+      "day_number": 2,
+      "topic_title": "NumPy arrays and vectorised maths",
+      "estimated_time": "2 Hours",
+      "concept_explanation": "NumPy stores numbers in one contiguous block instead of a list of objects, which is why operations run 50-100x faster. Learn shapes, slicing, broadcasting and boolean masks. Most pandas performance comes from these primitives.",
+      "key_takeaways": [
+        "Vectorised operations replace Python loops for numeric work.",
+        "Broadcasting stretches compatible shapes without copying data.",
+        "Boolean masks filter arrays faster than manual loops."
+      ],
+      "resources": [
+        {
+          "title": "NumPy: the absolute basics for beginners",
+          "url": "https://numpy.org/doc/stable/user/absolute_beginners.html",
+          "platform": "Official Docs",
+          "channel_or_author": "NumPy",
+          "relevance_note": "Short, practical introduction with runnable examples.",
+          "is_mcp_verified": false
+        }
+      ],
+      "practice_exercises": [
+        "Normalise a 5x5 random matrix to the 0-1 range using array maths only.",
+        "Compute pairwise Euclidean distance between two point arrays without a for loop."
+      ],
+      "assignment": "Compute a 7-point moving average over a noisy signal using np.convolve.",
+      "revision_checkpoint": "What shape does broadcasting produce for arrays of shape (4,1) and (1,3)?",
+      "completed": false
+    },
+    {
+      "day_number": 3,
+      "topic_title": "Pandas: loading, cleaning and grouping",
+      "estimated_time": "2 Hours",
+      "concept_explanation": "A DataFrame is a set of typed columns. Today is about the three operations that cover most real work: select the right rows, fix missing values, and aggregate by group. Learn to chain them so the pipeline reads top to bottom.",
+      "key_takeaways": [
+        "Use .loc for label-based selection and .iloc for positions.",
+        "groupby().agg() is a split-apply-combine in one line.",
+        "Decide on missing-value policy before you aggregate, not after."
+      ],
+      "resources": [
+        {
+          "title": "Pandas user guide: group by",
+          "url": "https://pandas.pydata.org/docs/user_guide/groupby.html",
+          "platform": "Official Docs",
+          "channel_or_author": "pandas",
+          "relevance_note": "Covers aggregation, transformation and filtering by group.",
+          "is_mcp_verified": false
+        }
+      ],
+      "practice_exercises": [
+        "Load a CSV, inspect dtypes, and convert a date column with pd.to_datetime.",
+        "Fill missing numeric values with the median per category."
+      ],
+      "assignment": "Take a retail sales CSV and produce revenue per region per month, sorted descending.",
+      "revision_checkpoint": "When does .query() read better than a boolean mask, and when does it not?",
+      "completed": false
+    },
+    {
+      "day_number": 4,
+      "topic_title": "Visualisation that answers a question",
+      "estimated_time": "2 Hours",
+      "concept_explanation": "A chart exists to answer one question. Choose the mark (bar, line, scatter) from the question, not from habit. Then strip everything that does not help: gridlines, legends for one series, and titles that restate the axis.",
+      "key_takeaways": [
+        "Distributions first, then relationships, then comparisons.",
+        "Sort bars by value; unsorted bars hide the ranking.",
+        "Label units on the axis, not in the title."
+      ],
+      "resources": [
+        {
+          "title": "Matplotlib: anatomy of a figure",
+          "url": "https://matplotlib.org/stable/users/explain/figure/figure_intro.html",
+          "platform": "Official Docs",
+          "channel_or_author": "Matplotlib",
+          "relevance_note": "Explains figures, axes and artists so you can control layout.",
+          "is_mcp_verified": false
+        }
+      ],
+      "practice_exercises": [
+        "Build a 1x3 panel: histogram, box plot and scatter for one dataset.",
+        "Recreate one chart from a news article and list what you changed."
+      ],
+      "assignment": "Chart the top 10 categories by revenue with a horizontal bar chart and direct value labels.",
+      "revision_checkpoint": "When is a box plot misleading, and what would you show instead?",
+      "completed": false
+    },
+    {
+      "day_number": 5,
+      "topic_title": "End-to-end mini project",
+      "estimated_time": "2 Hours",
+      "concept_explanation": "Combine the week: load a raw CSV, clean it, compute two grouped metrics, chart them, and write three sentences that a non-technical reader could act on. The deliverable is the notebook, not the code.",
+      "key_takeaways": [
+        "A notebook is a report; order the cells so it reads top to bottom.",
+        "State your cleaning decisions next to the code that makes them.",
+        "Every chart needs a one-line takeaway underneath."
+      ],
+      "resources": [
+        {
+          "title": "Jupyter: notebook basics",
+          "url": "https://jupyter-notebook.readthedocs.io/en/stable/notebook.html",
+          "platform": "Official Docs",
+          "channel_or_author": "Project Jupyter",
+          "relevance_note": "Short reference for cells, kernels and execution order.",
+          "is_mcp_verified": false
+        }
+      ],
+      "practice_exercises": [
+        "Pick a public CSV under 5 MB and document three data-quality problems.",
+        "Add a markdown cell after each chart with a one-sentence finding."
+      ],
+      "assignment": "Submit a notebook that answers one concrete question about the dataset, with two charts and a short written conclusion.",
+      "revision_checkpoint": "If a colleague reran your notebook top to bottom, would they get the same numbers? Why?",
+      "completed": false
+    }
+  ],
+  "capstone_project": {
+    "title": "Dataset investigation notebook",
+    "description": "Choose a public dataset, ask one question, clean the data, answer the question with two charts and three sentences, and note the limitations of your answer.",
+    "deliverables": [
+      "Notebook that runs top to bottom without errors",
+      "One paragraph on cleaning decisions",
+      "Two charts, each with a one-line takeaway",
+      "Three-sentence conclusion and one limitation"
+    ]
+  },
+  "next_steps": [
+    "Learn SQL so you can pull data without exporting CSVs.",
+    "Try scikit-learn on the same dataset to predict one column.",
+    "Read about experiment design before trusting any comparison."
+  ],
+  "created_at": null,
+  "requested_days": 5
+}
