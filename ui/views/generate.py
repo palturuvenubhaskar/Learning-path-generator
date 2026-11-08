@@ -10,7 +10,7 @@ from pydantic import ValidationError
 
 import storage
 from ai_generator import AILearningPathGenerator, GenerationError
-from config import MAX_PLAN_DAYS
+from config import MAX_PLAN_DAYS, AppConfig
 from models import ALLOWED_FORMATS, ALLOWED_SKILL_LEVELS, MAX_DAILY_HOURS, StudentGoalInput
 from ui import state, theme
 from ui.demo_data import load_demo_roadmap
@@ -120,9 +120,13 @@ def _summary() -> None:
 
 
 def _run_generation() -> None:
-    if not state.api_key():
+    api_key = state.api_key()
+    if not api_key:
         st.error("Add your OpenRouter API key in the sidebar first.")
         return
+    # Keep the key even if the browser never fired the sidebar on_change (for
+    # example, the user pasted it and pressed Generate straight away).
+    AppConfig.save_env_value("OPENROUTER_API_KEY", api_key)
     if not state.model_id():
         st.error("Pick a free model in the sidebar first.")
         return
@@ -153,7 +157,7 @@ def _run_generation() -> None:
         status.caption(message)
 
     try:
-        generator = AILearningPathGenerator(api_key=state.api_key(), model_name=state.model_id())
+        generator = AILearningPathGenerator(api_key=api_key, model_name=state.model_id())
         with st.spinner("Working on your plan..."):
             roadmap = generator.generate_roadmap(
                 payload,

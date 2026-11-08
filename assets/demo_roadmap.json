@@ -32,11 +32,11 @@
           "is_mcp_verified": false
         },
         {
-          "title": "Python for Beginners (search)",
-          "url": "https://www.youtube.com/results?search_query=python+for+beginners+full+course",
+          "title": "Learn Python - Full Course for Beginners",
+          "url": "https://www.youtube.com/watch?v=rfscVS0vtbw",
           "platform": "YouTube",
-          "channel_or_author": null,
-          "relevance_note": "Pick one long-form course and follow along in your own editor.",
+          "channel_or_author": "freeCodeCamp.org",
+          "relevance_note": "Long-form course: watch the first sections before Day 1 practice.",
           "is_mcp_verified": false
         }
       ],

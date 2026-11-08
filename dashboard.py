@@ -19,6 +19,15 @@ def _cached_models():
     return list_free_models()
 
 
+def _save_api_key() -> None:
+    """Keep the key across restarts instead of only in session memory."""
+    AppConfig.save_env_value("OPENROUTER_API_KEY", st.session_state.get("api_key_input", ""))
+
+
+def _save_model_choice() -> None:
+    AppConfig.save_env_value("OPENROUTER_MODEL", st.session_state.get("model_choice", ""))
+
+
 def _sidebar() -> None:
     session = st.session_state
     with st.sidebar:
@@ -32,8 +41,13 @@ def _sidebar() -> None:
             type="password",
             key="api_key_input",
             value=AppConfig.get_openrouter_api_key() or "",
-            help="Create a free key at openrouter.ai/keys",
+            on_change=_save_api_key,
+            help="Create a free key at openrouter.ai/keys. It is saved to .env on this machine.",
         )
+        if state.api_key():
+            st.caption("✓ Key saved locally in .env")
+        else:
+            st.caption("Paste a key once; it stays saved on this machine.")
 
         models = _cached_models()
         ids = [model.id for model in models]
@@ -46,18 +60,27 @@ def _sidebar() -> None:
         if session.get("model_choice") not in ids:
             session.model_choice = fallback
 
-        st.selectbox(
-            "Free model",
-            ids,
-            key="model_choice",
-            format_func=lambda model_id: next(
-                (model.label for model in models if model.id == model_id), model_id
-            ),
-            help="Only free models are listed. Some handle long JSON better than others.",
-        )
-        if st.button("Refresh model list", use_container_width=True):
-            _cached_models.clear()
-            st.rerun()
+        model_col, refresh_col = st.columns([4, 1], vertical_alignment="bottom")
+        with model_col:
+            st.selectbox(
+                "Free model",
+                ids,
+                key="model_choice",
+                on_change=_save_model_choice,
+                format_func=lambda model_id: next(
+                    (model.label for model in models if model.id == model_id), model_id
+                ),
+                help="Only free models are listed. Your choice is saved in .env.",
+            )
+        with refresh_col:
+            if st.button(
+                "↻",
+                key="refresh_models",
+                help="Refresh the free model list",
+                use_container_width=True,
+            ):
+                _cached_models.clear()
+                st.rerun()
 
         with st.expander("Custom model id"):
             st.text_input(
@@ -68,7 +91,17 @@ def _sidebar() -> None:
             )
 
         st.divider()
-        with st.expander("MCP endpoints"):
+        configured = sum(
+            1
+            for url in (
+                AppConfig.get_youtube_mcp_url(session.get("yt_url")),
+                AppConfig.get_drive_mcp_url(session.get("drive_url")),
+                AppConfig.get_notion_mcp_url(session.get("notion_url")),
+            )
+            if url
+        )
+        mcp_label = f"MCP endpoints · {configured} set" if configured else "MCP endpoints"
+        with st.expander(mcp_label):
             st.text_input(
                 "YouTube MCP URL",
                 key="yt_url",

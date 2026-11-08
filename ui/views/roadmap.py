@@ -8,6 +8,68 @@ import storage
 from exporter import RoadmapExporter, safe_filename
 from ui import state, theme
 from ui.state import render_flash as state_render_flash
+from youtube import thumbnail_url, video_id, watch_url
+
+
+def _resource_meta(resource) -> str:
+    parts = [resource.platform]
+    if resource.channel_or_author:
+        parts.append(resource.channel_or_author)
+    if resource.is_mcp_verified:
+        parts.append("MCP verified")
+    return " · ".join(parts)
+
+
+def _render_link_resource(resource) -> None:
+    st.markdown(f"- [{resource.title}]({resource.url}) · {_resource_meta(resource)}")
+    if resource.relevance_note:
+        st.caption(resource.relevance_note)
+
+
+def _render_video_resource(roadmap, day, index: int, resource, video: str) -> None:
+    """Thumbnail card that swaps into an embedded player on click."""
+    key = f"{roadmap.id}_{day.day_number}_{index}"
+    watch = watch_url(video)
+
+    if st.session_state.get("playing_video") == key:
+        st.video(watch)
+        st.caption(f"{resource.title} · {_resource_meta(resource)} · playing in the app")
+        first, second, _ = st.columns([1, 1, 3])
+        with first:
+            if st.button("Close player", key=f"close_{key}", use_container_width=True):
+                st.session_state.playing_video = None
+                st.rerun()
+        with second:
+            st.link_button("Open on YouTube", watch, use_container_width=True)
+        return
+
+    thumb, info = st.columns([1, 2.4], gap="small")
+    with thumb:
+        st.image(
+            thumbnail_url(video),
+            alt=f"Thumbnail for {resource.title}",
+            width="stretch",
+        )
+    with info:
+        st.markdown(f"**{resource.title}**")
+        st.caption(_resource_meta(resource))
+        if resource.relevance_note:
+            st.caption(resource.relevance_note)
+        if st.button("▶ Watch here", key=f"play_{key}"):
+            st.session_state.playing_video = key
+            st.rerun()
+
+
+def _render_resources(roadmap, day) -> None:
+    if not day.resources:
+        return
+    st.markdown("**Resources**")
+    for index, resource in enumerate(day.resources):
+        video = video_id(resource.url)
+        if video:
+            _render_video_resource(roadmap, day, index, resource, video)
+        else:
+            _render_link_resource(resource)
 
 
 def _render_day(roadmap, day, checked: bool) -> None:
@@ -29,12 +91,7 @@ def _render_day(roadmap, day, checked: bool) -> None:
                 st.markdown(f"- {takeaway}")
 
         if day.resources:
-            st.markdown("**Resources**")
-            for resource in day.resources:
-                suffix = " · MCP verified" if resource.is_mcp_verified else ""
-                st.markdown(f"- [{resource.title}]({resource.url}) · {resource.platform}{suffix}")
-                if resource.relevance_note:
-                    st.caption(resource.relevance_note)
+            _render_resources(roadmap, day)
 
         if day.practice_exercises:
             st.markdown("**Practice**")

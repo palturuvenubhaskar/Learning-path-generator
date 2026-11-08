@@ -53,7 +53,7 @@ def render() -> None:
     st.divider()
     st.markdown("### Privacy")
     st.markdown(
-        "- The API key is held in the Streamlit session. It is not written to disk.\n"
+        "- The API key is saved to `.env` on this machine when you enter it in the sidebar.\n"
         "- Plans are stored in `data/app.db` next to the app. Delete the file to wipe them.\n"
         "- Only the text you type in the form is sent to OpenRouter."
     )
@@ -67,4 +67,4 @@ def render() -> None:
         "streamlit run app.py",
         language="powershell",
     )
-    st.caption("Set OPENROUTER_API_KEY in .env, or paste a key in the sidebar.")
+    st.caption("Paste a key in the sidebar; the app saves it to .env for next time.")

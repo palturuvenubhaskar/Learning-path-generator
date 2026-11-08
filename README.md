@@ -16,6 +16,7 @@ Plans and progress are saved locally in SQLite, so a refresh does not lose your 
 | Generation | One OpenRouter chat request returns a JSON object. Malformed or truncated output is repaired once. |
 | Validation | `LearningRoadmap` validates the JSON and renumbers days so keys can never collide. |
 | MCP (optional) | A YouTube MCP server is used to search real links. Only returned URLs get a "verified" label. |
+| Player | YouTube video resources show a thumbnail; **Watch here** plays them inside the app. |
 | Storage | Plans and checkboxes live in `data/app.db`. |
 | Export | Markdown, JSON, or an upload through a Google Drive MCP server. |
 
@@ -37,6 +38,7 @@ openrouter_models.py    # live catalog of free models
 mcp_client.py           # MCP health checks, YouTube search, Drive upload
 exporter.py             # Markdown / JSON / Drive export
 storage.py              # SQLite persistence
+youtube.py              # YouTube link parsing, thumbnails, watch URLs
 ui/
   theme.py              # CSS and small render helpers
   state.py              # session state and navigation
@@ -71,7 +73,7 @@ OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
 Get a free key at <https://openrouter.ai/keys>. You can also paste it into the app
-sidebar; it is kept in memory only and never written to disk.
+sidebar; the app saves it to `.env` so it is there next time.
 
 Run it:
 
@@ -124,7 +126,7 @@ The suite is offline: MCP and OpenRouter calls are mocked.
 
 ## Privacy
 
-- The API key stays in the Streamlit session.
+- The API key is saved to `.env` on this machine when you enter it in the sidebar.
 - Plans are stored in `data/app.db` on this machine. Delete that folder to wipe them.
 - Only the text you type into the form is sent to OpenRouter.
 

@@ -60,6 +60,20 @@ section[data-testid="stSidebar"] .block-container {
   padding: 1.4rem 1.1rem 3rem 1.1rem;
   max-width: 100%;
 }
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+  gap: 0.6rem;
+}
+section[data-testid="stSidebar"] hr {
+  margin: 0.45rem 0;
+}
+section[data-testid="stSidebar"] [data-testid="stExpander"] {
+  margin-bottom: 0;
+}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 { font-size: 0.95rem; }
@@ -186,6 +200,13 @@ div[data-testid="stExpander"] summary {
   padding: 0.55rem 0.85rem;
 }
 div[data-testid="stExpander"] summary:hover { color: var(--lpg-fg); }
+
+/* ---------- video cards ---------- */
+[data-testid="stImage"] img {
+  border: 1px solid var(--lpg-border);
+  border-radius: 8px;
+  display: block;
+}
 
 /* ---------- metrics ---------- */
 div[data-testid="stMetric"] {
