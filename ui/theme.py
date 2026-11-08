@@ -27,9 +27,10 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
 }
 
 header[data-testid="stHeader"] {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid transparent;
+  /* Transparent, no blur: the frosted bar smeared the nav pill when it
+     scrolled underneath. Keeping it clear leaves the nav readable. */
+  background: transparent;
+  backdrop-filter: none;
 }
 
 #MainMenu, footer,

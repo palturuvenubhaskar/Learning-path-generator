@@ -4,8 +4,15 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from mcp_client import MCPManager, extract_urls, looks_like_error, stringify
-from models import DayTopic, LearningRoadmap
+from mcp_client import (
+    MCPManager,
+    extract_urls,
+    is_video_url,
+    looks_like_error,
+    sanitize_youtube_links,
+    stringify,
+)
+from models import DayTopic, LearningResource, LearningRoadmap
 
 
 class FakeTool:
@@ -175,6 +182,40 @@ def test_enrichment_adds_nothing_when_search_is_empty():
 def test_extract_urls_is_unique_and_ordered():
     text = "a https://x.test/1 b https://x.test/1 c https://x.test/2."
     assert extract_urls(text) == ["https://x.test/1", "https://x.test/2"]
+
+
+def test_is_video_url_only_accepts_playable_links():
+    assert is_video_url("https://www.youtube.com/watch?v=abc123")
+    assert is_video_url("https://youtu.be/abc123")
+    assert is_video_url("https://www.youtube.com/shorts/abc123")
+    assert not is_video_url("https://www.youtube.com/")
+    assert not is_video_url("https://www.youtube.com/@somechannel")
+    assert not is_video_url("https://www.youtube.com/results?search_query=python")
+    assert not is_video_url("https://example.com/watch?v=abc123")
+
+
+def test_enrichment_skips_home_page_and_channel_results():
+    FakeClient.tools = [_search_tool("https://www.youtube.com/ https://www.youtube.com/@channel")]
+    roadmap = _roadmap(2)
+    with patch("mcp_client.MultiServerMCPClient", FakeClient):
+        verified = MCPManager.enrich_roadmap_with_youtube(roadmap, "https://yt.invalid/mcp", max_searches=2)
+    assert verified == 0
+    assert all(not day.resources for day in roadmap.days)
+
+
+def test_sanitize_replaces_non_video_youtube_links():
+    roadmap = _roadmap(1)
+    roadmap.days[0].resources = [
+        LearningResource(title="Home", url="https://www.youtube.com/"),
+        LearningResource(title="Video", url="https://www.youtube.com/watch?v=ok123"),
+        LearningResource(title="Docs", url="https://docs.python.org/3/"),
+    ]
+    repaired = sanitize_youtube_links(roadmap)
+    assert repaired == 1
+    urls = [resource.url for resource in roadmap.days[0].resources]
+    assert urls[0].startswith("https://www.youtube.com/results?search_query=")
+    assert "watch?v=ok123" in urls[1]
+    assert urls[2] == "https://docs.python.org/3/"
 
 
 def test_stringify_handles_nested_values():

@@ -17,12 +17,20 @@ import concurrent.futures
 import json
 import re
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote_plus
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from models import LearningResource, LearningRoadmap
 
 URL_PATTERN = re.compile(r"https?://[^\s\"'<>\)\]\}]+")
+
+# Only these shapes are playable videos. Channel pages, search results, the
+# home page and playlists are not useful as "verified" learning resources.
+VIDEO_URL_PATTERN = re.compile(
+    r"(?:youtube\.com/(?:watch\?[^\s#]*\bv=|shorts/|live/|embed/|v/)|youtu\.be/)",
+    re.IGNORECASE,
+)
 
 SEARCH_ARG_NAMES = ["query", "q", "search_query", "searchQuery", "term", "keyword", "keywords"]
 FILENAME_ARG_NAMES = ["name", "file_name", "filename", "fileName", "title", "path"]
@@ -64,6 +72,39 @@ def extract_urls(text: str) -> List[str]:
             seen.add(url)
             urls.append(url)
     return urls
+
+
+def is_video_url(url: str) -> bool:
+    """True only for a playable YouTube video link, not a channel or home page."""
+    return bool(VIDEO_URL_PATTERN.search(url or ""))
+
+
+def is_youtube_url(url: str) -> bool:
+    lowered = (url or "").lower()
+    return "youtube.com" in lowered or "youtu.be" in lowered
+
+
+def youtube_search_url(query: str) -> str:
+    """A search URL always opens a useful YouTube page, never the home screen."""
+    term = (query or "").strip() or "tutorial"
+    return f"https://www.youtube.com/results?search_query={quote_plus(term)}"
+
+
+def sanitize_youtube_links(roadmap: LearningRoadmap) -> int:
+    """
+    Replace YouTube links that are not playable videos (home page, channel,
+    playlist, search page) with a search URL for that day's topic.
+
+    Returns the number of links repaired.
+    """
+    repaired = 0
+    for day in roadmap.days:
+        for resource in day.resources:
+            if not is_youtube_url(resource.url) or is_video_url(resource.url):
+                continue
+            resource.url = youtube_search_url(f"{day.topic_title} tutorial")
+            repaired += 1
+    return repaired
 
 
 def _schema_properties(tool: Any) -> Dict[str, Any]:
@@ -272,9 +313,12 @@ class MCPManager:
 
         verified = 0
         for index, (day, urls) in enumerate(zip(days, results)):
-            if not urls:
+            # Never attach a channel page, playlist or the YouTube home page:
+            # those open "go to home" instead of a tutorial.
+            video_urls = [candidate for candidate in urls if is_video_url(candidate)]
+            if not video_urls:
                 continue
-            url = next((candidate for candidate in urls if "youtube.com" in candidate or "youtu.be" in candidate), urls[0])
+            url = video_urls[0]
             if any(resource.url == url for resource in day.resources):
                 continue
             day.resources.insert(

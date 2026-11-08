@@ -309,6 +309,12 @@ class AILearningPathGenerator:
 
         roadmap = self._validate(data, content, messages)
 
+        # Model-suggested links are often the YouTube home page or a channel.
+        # Point those at a real search for the day's topic instead.
+        from mcp_client import sanitize_youtube_links
+
+        sanitize_youtube_links(roadmap)
+
         if len(roadmap.days) != target_days:
             self.last_warnings.append(
                 f"You asked for {target_days} days but the model returned {len(roadmap.days)}. "
